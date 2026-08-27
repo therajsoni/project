@@ -1,4 +1,4 @@
-
+<p>
 next js is a react based full stack web framework for building user friendly application 
 react = react ui components banne ki library 
 nextjs = react ke upar bana framework
@@ -2309,3 +2309,6 @@ class MyComponent extends Component {
   }
 }
 export default MyComponent;
+
+</p>
+   

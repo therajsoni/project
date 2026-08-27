@@ -1,0 +1,2311 @@
+
+next js is a react based full stack web framework for building user friendly application 
+react = react ui components banne ki library 
+nextjs = react ke upar bana framework
+advantage = routing , ssr , ssg , server components , api/ route handlers , middleware , image optimization , caching , code splitting 
+Next.js = React + production-ready web application features
+disadvantage = more configuration , caching issue when not know 
+
+
+react                                   Nextjs 
+
+library                                framework
+mainly ui                              full stack web applications
+routing alag se                        built in routing 
+csr commonly used                      csr ssr ssg etc 
+simple to start                        more concepts 
+more flexible                          more conventions
+small apps ke liye good                production / complex apps ke liye powerful 
+
+
+which linter you like to use ?
+eslint , biome none , skip , linter configuration
+linter = Linter एक ऐसा tool है जो आपके code को automatically check करता है और बताता है कि code में mistakes, bugs, bad practices या inconsistent style तो नहीं है।
+| Option                   | Meaning                         | Recommendation    |
+| ------------------------ | ------------------------------- | ----------------- |
+| **ESLint**               | Popular JavaScript/React linter | ⭐ **Best choice** |
+| **Biome**                | Fast linter + formatter         | अच्छा alternative |
+| **None**                 | कोई linter नहीं                 | ❌                 |
+| **Skip**                 | Linter setup छोड़ना             | ❌                 |
+| **Linter configuration** | Custom/manual configuration     | Advanced users    |
+
+
+what is react complier 
+React Compiler is a build-time compiler that automatically optimizes React applications by analyzing your components and determining when components and their values need to be re-rendered.
+
+folder structure and flow of run 
+
+src/                  → Application ka main source code  , src/app 
+public/               → Static files (images, icons, etc.)
+package.json          → Project dependencies aur scripts
+next.config.ts        → Next.js ki configuration
+tsconfig.json         → TypeScript ki configuration
+node_modules/         → Installed npm packages
+AGENTS.md             → AI agents ke project-specific instructions
+package-lock.json     → Dependencies ke exact versions lock karta hai
+CLAUDE.md             → Claude/AI ke project-specific instructions
+postcss.config.mjs    → PostCSS ki configuration
+next-env.d.ts         → Next.js ke TypeScript type declarations
+README.md             → Project ki documentation/instructions  
+
+
+React folder structure
+
+index.html            → Application ka main HTML entry point
+src/                  → Application ka main source code
+public/               → Static files (images, icons, etc.)
+package.json          → Dependencies aur scripts
+package-lock.json     → Dependencies ke exact versions lock karta hai
+node_modules/         → Installed npm packages
+vite.config.ts        → Vite ki configuration
+tsconfig.json         → TypeScript ki main configuration
+tsconfig.app.json     → Application ke TypeScript settings
+tsconfig.node.json    → Node.js/Vite files ke TypeScript settings
+eslint.config.js      → ESLint ki configuration
+README.md             → Project ki documentation
+
+Routing 
+
+1. single page route
+
+/app
+ page.js 
+ is / 
+ 
+/app/dashboard 
+ page.js 
+  is /dashboard
+
+example : 
+
+"use client";
+import { usePathname } from "next/navigation";
+export default function Page() {
+  const pathname = usePathname();
+  return <h1>{pathname}</h1>;
+}
+
+output = /dashboard
+
+2. nested route 
+
+app/
+├── page.js
+└── dashboard/
+    ├── page.js
+    └── settings/
+        └── page.js
+
+/dashboard/settings
+
+example : 
+
+"use client";
+import { usePathname } from "next/navigation";
+export default function Page() {
+  const pathname = usePathname();
+  return <h1>{pathname}</h1>;
+}
+
+output = /dashboard/settings
+
+3. dyanmic route 
+
+note : [] is dyanmic
+app/ 
+ [id]/ 
+   page.js 
+
+app/anything 
+anything = id 
+
+example
+
+export default async function Page({ params }: any) {
+  const { id, roll } = await params;
+  console.log(roll);
+
+  return (
+    <>
+      <h1>ID: {id}</h1>
+      <h1>Roll: {roll}</h1>
+      {/* undefined */}
+    </>
+  );
+}
+
+output = http://localhost:3000/1 
+id = 1
+roll = undefined
+
+note : if any route not find that is undefined
+
+4. nested dyanmic route 
+
+note : [] is dyanmic
+app/ 
+ [id]/ 
+  [roll]/
+   page.js 
+
+app/anything1/anything2  
+anything1 = id 
+anything2 = roll 
+
+example
+
+export default async function Page({ params }: any) {
+  const { id, roll } = await params;
+  console.log(roll);
+
+  return (
+    <>
+      <h1>ID: {id}</h1>
+      <h1>Roll: {roll}</h1>
+    </>
+  );
+}
+
+output = http://localhost:3000/1/Rajsoni 
+id = 1
+roll = Rajsoni
+
+note : if any route not find that is undefined
+
+5. catch all segments 
+
+note : [...] is dyanmic and catch all segments
+
+app/ 
+ [...id]/ 
+   page.js 
+
+app/anything1/anything2/anything3 .... /anythingINFINITY
+
+note : Invalid Routing design 
+app/ 
+ [...id]/ 
+   [...roll]/
+   page.js 
+
+export default async function Page({ params }) {
+  const { slug } = await params;
+
+  return (
+    <div>
+      {slug.map((item, index) => (
+        <p key={index}>{item}</p>
+      ))}
+    </div>
+  );
+}
+
+url = http://localhost:3000/catch/anymore1/anymore2/anymore3
+output = 
+anymore1
+anymore2
+anymore3
+
+6. query 
+
+"use client";
+
+import { useSearchParams } from "next/navigation";
+
+export default function Page() {
+  const searchParams = useSearchParams();
+
+  const id = searchParams.get("id");
+  const name = searchParams.get("name");
+  const lname = searchParams.get("lname");
+ 
+  return (
+    <>
+      <p>{id}</p>
+      <p>{name}</p>
+      <p>{lname}</p> // undefined
+    </>
+  );
+}
+ 
+url = http://localhost:3000/query?id=1&name=Rajsoni
+
+note : if query not find then undefined
+
+7. note : it is valid 
+
+app/
+├── dashboard/
+│   └── page.js
+│
+├── [id]/
+│   └── page.js
+│
+└── [...catch]/
+    └── page.js
+
+Specific file conventions
+
+page.js              → Page UI
+layout.js            → Shared Layout
+loading.js            → Loading UI
+error.js              → Error UI
+global-error.js      → Global Error UI
+not-found.js         → 404 / Not Found UI
+forbidden.js         → 403 / Forbidden UI
+unauthorized.js      → 401 / Unauthorized UI
+template.js          → Re-rendered Layout
+default.js           → Parallel Route का fallback UI
+route.js             → API / Route Handler
+middleware.js/ts     → Request Middleware
+
+layout.js = Shared Layout 
+app/
+├── layout.js
+└── dashboard/
+    └── page.js
+    └── layout.js 
+
+example 
+export default function Layout({ children }) {
+  return (
+    <>
+      <nav>Navbar</nav>
+      {children}
+      <footer>Footer</footer>
+    </>
+  );
+}
+
+
+loading.js 
+
+app/
+└── dashboard/
+    ├── page.js
+    └── loading.js
+└── loading.js 
+
+example 
+
+export default function Loading() {
+  return <h1>Loading...</h1>;
+}
+
+error.js 
+
+app/
+└── dashboard/
+    ├── page.js
+    └── error.js
+
+example
+
+"use client";
+
+export default function Error({ reset }) {
+  return (
+    <div>
+      <h1>Something went wrong!</h1>
+
+      <button onClick={() => reset()}>
+        Try Again
+      </button>
+    </div>
+  );
+}
+
+note : 
+ error.js
+    ↓
+ specific route segment ka error
+ 
+ global-error.js
+    ↓
+ global application-level error
+
+global-error.js
+
+app/
+├── global-error.js
+└── layout.js
+
+example
+
+"use client";
+
+export default function GlobalError({ error, reset }) {
+  return (
+    <html>
+      <body>
+        <h1>Something went seriously wrong!</h1>
+
+        <button onClick={() => reset()}>
+          Try Again
+        </button>
+      </body>
+    </html>
+  );
+}
+
+not-found.js = 404
+
+app/
+├── not-found.js
+│
+├── dashboard/
+│   ├── page.js
+│   ├── not-found.js
+│   │
+│   ├── users/
+│   │   ├── page.js
+│   │   └── not-found.js
+│   │
+│   └── settings/
+│       └── page.js
+│
+└── products/
+    ├── page.js
+    ├── not-found.js
+    │
+    └── [id]/
+        ├── page.js
+        └── not-found.js
+
+export default function NotFound() {
+  return <h1>404 - Page Not Found</h1>;
+}
+
+use :
+ /users/123
+ import { notFound } from "next/navigation";
+ if (!user) {
+   notFound();
+  }
+
+forbidden.js = 403 (unauthorized access)
+
+app/
+├── forbidden.js
+└── dashboard/
+    └── page.js
+
+example 
+export default function Forbidden() {
+  return (
+    <h1>
+      403 - You don't have permission to access this page.
+    </h1>
+  );
+}
+
+User
+ ↓
+Dashboard
+ ↓
+Permission check
+ ↓
+No permission
+ ↓
+403 Forbidden
+
+use: 
+import { forbidden } from "next/navigation";
+
+export default function Dashboard() {
+  const hasPermission = false;
+
+  if (!hasPermission) {
+    forbidden();
+  }
+
+  return <h1>Dashboard</h1>;
+}
+
+unauthorized.js -> 401 unauthorized
+
+app/
+├── unauthorized.js
+└── dashboard/
+    └── page.js
+
+export default function Unauthorized() {
+  return (
+    <h1>
+      401 - Please login first
+    </h1>
+  );
+}
+
+User
+ ↓
+/dashboard
+ ↓
+Logged in?
+ ↓
+NO
+ ↓
+401 Unauthorized
+
+example
+
+import { unauthorized } from "next/navigation";
+export default function Dashboard() {
+  const isLoggedIn = false;
+  if (!isLoggedIn) {
+    unauthorized();
+  }
+  return <h1>Dashboard</h1>;
+}
+
+
+template.js
+
+app/
+└── dashboard/
+    ├── template.js
+    └── page.js
+
+export default function Template({ children }) {
+  return (
+    <div>
+      <h2>Dashboard Template</h2>
+      {children}
+    </div>
+  );
+}
+
+हर navigation पर component/state को fresh instance चाहिए, template useful हो सकता है।
+Both can be in one place 
+app/
+└── dashboard/
+    ├── layout.js
+    ├── template.js
+    └── page.js
+
+Layout
+  ↓
+Template
+  ↓
+Page
+
+<Layout>
+  <Template>
+    <Page />
+  </Template>
+</Layout>
+
+layout.js 
+export default function Layout({ children }) {
+  console.log("Layout");
+  return (
+    <div>
+      <h1>Dashboard Layout</h1>
+      {children}
+    </div>
+  );
+}
+
+template.js 
+export default function Template({ children }) {
+  console.log("Template");
+  return (
+    <div>
+      <p>Dashboard Template</p>
+      {children}
+    </div>
+  );
+}
+
+page.js 
+export default function Page() {
+  console.log("Page");
+  return <h2>Dashboard Page</h2>;
+}
+
+output
+Dashboard Layout
+      ↓
+Dashboard Template
+      ↓
+Dashboard Page
+
+
+default.js 
+
+app/
+├── @users/
+│   └── page.js
+│
+├── @notifications/
+│   └── page.js
+│
+└── default.js
+
+@users और @notifications को parallel route slots कहते हैं।
+
+अगर किसी slot के लिए matching UI नहीं मिलती, तो default.js fallback UI provide कर सकता है।
+
+example
+export default function Default() {
+  return <p>Default content</p>;
+}
+
+route.js = Route Handler / API
+
+app/
+└── api/
+    └── users/
+        └── route.js
+
+export async function GET() {
+  return Response.json({
+    message: "Hello",
+  });
+}
+
+GET /api/users
+
+middleware.js / proxy.ts 
+
+example : 
+
+import { NextResponse } from "next/server";
+export function middleware(request) {
+  const token = request.cookies.get("token")?.value;
+  if (token) {
+    return NextResponse.next();
+  }
+  return NextResponse.redirect(new URL("/login", request.url));
+}
+export const config = {
+  matcher: ["/dashboard/:path*"],
+};
+
+note : 
+
+User Request
+     ↓
+Proxy / Middleware
+     ↓
+Authentication check
+     ↓
+Page
+
+manifest.js 
+
+app/
+└── manifest.js
+
+यह web app की metadata/configuration define करने के लिए होता है, जैसे:
+
+example
+export default function manifest() {
+  return {
+    name: "My App",
+    short_name: "App",
+    start_url: "/",
+  };
+}
+
+
+app/
+│
+├── page.js              → Page/UI
+├── layout.js            → Shared Layout
+├── template.js          → Re-created Template
+│
+├── loading.js            → Loading UI
+├── error.js              → Route Error UI
+├── global-error.js       → Global Error UI
+│
+├── not-found.js          → 404 UI
+├── forbidden.js          → 403 UI
+├── unauthorized.js       → 401 UI
+│
+├── default.js            → Parallel Route fallback
+├── route.js              → API / Route Handler
+│
+├── sitemap.js            → Sitemap
+├── robots.js             → Robots configuration
+└── manifest.js           → Web App Manifest
+
+page.js
+    ↓
+Page
+
+layout.js
+    ↓
+Shared UI
+
+loading.js
+    ↓
+Loading
+
+error.js
+    ↓
+Error
+
+global-error.js
+    ↓
+Global Error
+
+not-found.js
+    ↓
+404
+
+forbidden.js
+    ↓
+403
+
+unauthorized.js
+    ↓
+401
+
+route.js
+    ↓
+API
+
+template.js
+    ↓
+Fresh template instance
+
+
+Invalid tsx js conflict 
+
+dashboard
+ page.tsx 
+abroad 
+ page.js 
+
+if project is js based then dashboard route Invalid and not run 
+if project is ts based then abroad route Invalid and not run  
+
+
+Api calls 
+
+app/
+└── api/
+    └── users/
+        └── route.js
+export async function GET() {
+  return Response.json({
+    message: "Get all users",
+  });
+}
+GET /api/users
+
+
+app/
+└── api/
+    └── users/
+        └── [id]/
+            └── route.js
+export async function GET(request, { params }) {
+  const { id } = await params;
+
+  return Response.json({
+    message: "Get user",
+    id,
+  });
+}
+GET /api/users/123
+
+
+export async function POST(request) {
+  const data = await request.json();
+
+  return Response.json({
+    message: "User created",
+    data,
+  });
+}
+POST /api/users
+Body 
+{
+  "name": "Raj",
+  "age": 22
+}
+
+
+PUT = पूरा data update करना
+export async function PUT(request, { params }) {
+  const { id } = await params;
+  const data = await request.json();
+
+  return Response.json({
+    message: "User completely updated",
+    id,
+    data,
+  });
+}
+PUT /api/users/123
+
+
+PATCH = Partial data update करना
+export async function PATCH(request, { params }) {
+  const { id } = await params;
+  const data = await request.json();
+
+  return Response.json({
+    message: "User partially updated",
+    id,
+    data,
+  });
+}
+PATCH /api/users/123
+export async function DELETE(request, { params }) {
+  const { id } = await params;
+
+  return Response.json({
+    message: "User deleted",
+    id,
+  });
+}
+DELETE /api/users/123
+
+file colocation
+एक ही route folder के अंदर उस route से related files/components को साथ रखना।
+app/
+└── dashboard/
+    ├── page.js
+    ├── loading.js
+    ├── error.js
+    ├── DashboardChart.js
+    ├── UserTable.js
+    └── utils.js
+
+private folder = _ is symbol prefix 
+Next.js में Private Folder ऐसा folder होता है जिसे URL route नहीं माना जाता।
+app/
+├── page.js
+├── dashboard/
+│   ├── page.js
+│   └── _components/
+│       ├── UserTable.js
+│       └── Chart.js
+└── _lib/
+    └── db.js
+
+route groups = () is symbol
+ऐसा folder जो files को organize करता है, लेकिन उसका folder name URL में दिखाई नहीं देता।
+app/
+├── (auth)/
+│   ├── login/
+│   │   └── page.js
+│   └── register/
+│       └── page.js
+│
+└── (dashboard)/
+    └── dashboard/
+        └── page.js
+
+routing metadata 
+अगर तुम Next.js Metadata की बात कर रहे हो, तो यह routing नहीं, बल्कि page की SEO/browser information define करने का तरीका है।
+
+1. static metadata = layout.js | page.js 
+import { Metadata } from "next";
+export const metadata = {
+  title: "Dashboard",
+  description: "My Dashboard",
+};
+export default function Page() {
+  return <h1>Dashboard</h1>;
+}
+
+2. layout.js 
+app/
+├── layout.js
+└── dashboard/
+    └── page.js
+export const metadata = {
+  title: "My App",
+  description: "My application",
+};
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>{children}</body>
+    </html>
+  );
+}    
+
+3. Page-specific Metadata
+export const metadata = {
+  title: "Dashboard",
+  description: "User dashboard",
+};
+export default function Page() {
+  return <h1>Dashboard</h1>;
+}
+
+4. Dynamic Metadata
+app/
+└── products/
+    └── [id]/
+        └── page.js
+export async function generateMetadata({ params }) {
+  const { id } = await params;
+  return {
+    title: `Product ${id}`,
+    description: `Details of product ${id}`,
+  };
+}
+export default async function Page({ params }) {
+  const { id } = await params;
+  return <h1>Product {id}</h1>;
+}
+
+link component
+
+import Link from "next/link";
+export default function Home() {
+  return (
+    <div>
+      <Link href="/dashboard">
+        Go to Dashboard
+      </Link>
+    </div>
+  );
+}
+
+navigating and redirect 
+
+useRouter
+
+"use client";
+import { useRouter } from "next/navigation";
+export default function Login() {
+  const router = useRouter();
+  function handleLogin() {
+    // login logic
+    router.push("/dashboard");
+  }
+  return (
+    <button onClick={handleLogin}>
+      Login
+    </button>
+  );
+}
+router.push("/dashboard");
+router.replace("/dashboard");
+router.back();
+router.forward();
+router.refresh();
+
+redirect
+
+import { redirect } from "next/navigation";
+export default function Dashboard() {
+  const isLoggedIn = false;
+  if (!isLoggedIn) {
+    redirect("/login");
+  }
+  return <h1>Dashboard</h1>;
+}
+
+| Method                    | Use                                            |
+| ------------------------- | ---------------------------------------------- |
+| `<Link>`                  | User clicks a link                             |
+| `router.push()`           | Client-side programmatic navigation            |
+| `router.replace()`        | Navigate without keeping current history entry |
+| `router.back()`           | Previous page                                  |
+| `redirect()`              | Server-side redirect                           |
+| `NextResponse.redirect()` | Middleware redirect                            |
+
+
+recovering from error 
+
+error.js 
+"use client";
+import { useEffect } from "react";
+export default function Error({ error, reset }) {
+  useEffect(() => {
+    console.error(error);
+  }, [error]);
+  return (
+    <div>
+      <h2>Something went wrong!</h2>
+
+      <button onClick={() => reset()}>
+        Try again
+      </button>
+    </div>
+  );
+}
+
+use 
+export default function Dashboard() {
+  throw new Error("Database connection failed");
+  return <h1>Dashboard</h1>;
+}
+
+
+parallel routes = @
+Parallel Routes ka matlab hai ki ek hi page/layout ke andar multiple UI sections ko independently render karna.
+
+app/
+├── layout.js
+├── page.js
+│
+├── @sidebar/
+│   └── page.js
+│
+└── @content/
+    └── page.js
+
+layout.js 
+export default function Layout({
+  children,
+  sidebar,
+  content,
+}) {
+  return (
+    <div>
+      {sidebar}
+
+      {content}
+
+      {children}
+    </div>
+  );
+}
+
+┌─────────────────────────────────────┐
+│             Layout                  │
+│                                     │
+│  ┌──────────┐   ┌────────────────┐ │
+│  │ Sidebar  │   │    Content     │ │
+│  │          │   │                │ │
+│  │ @sidebar │   │    @content    │ │
+│  └──────────┘   └────────────────┘ │
+│                                     │
+│            children                 │
+└─────────────────────────────────────┘
+
+intercepting route 
+Intercepting Route ka use tab hota hai jab tum current page ko maintain rakhte hue kisi doosre route ka content temporarily show karna chahte ho.
+
+app/
+├── products/
+│   ├── page.js
+│   └── [id]/
+│       └── page.js
+│
+└── @modal/
+    └── (.)products/
+        └── [id]/
+            └── page.js
+
+(.)       → Same level
+(..)      → One level up
+(..)(..)  → Two levels up
+(...)     → Root app directory            
+
+header route
+import { headers } from "next/headers";
+export async function GET() {
+  const headersList = await headers();
+  const authorization = headersList.get("authorization");
+  const userAgent = headersList.get("user-agent");
+
+  return Response.json({
+    authorization,
+    userAgent,
+  });
+}
+
+cookies route 
+import { cookies } from "next/headers";
+
+export async function GET() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+  cookieStore.set("token", "abc123");
+  return Response.json({
+    token,
+  });
+}
+
+
+lazy and suspense if only lazy not use suspense then work both react and nextjs in browserroute tag route tag 
+
+Normal import
+   ↓
+Saara code initially load
+lazy()
+   ↓
+Component ki zarurat padne par code load
+
+if only lazy not use suspense then work both react and nextjs in browserroute tag route tag  = error aa sakta hai 
+
+example 
+
+import { lazy, Suspense } from "react";
+const Profile = lazy(() => import("./Profile"));
+function App() {
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <Profile />
+    </Suspense>
+  );
+}
+
+generateStaticParams
+generateStaticParams() dynamic routes ko build time par statically generate karne ke liye use hota hai
+app/
+└── products/
+    └── [id]/
+        └── page.js
+
+example :         
+export async function generateStaticParams() {
+  const res = await fetch("https://api.example.com/products");
+  const products = await res.json();
+  return products.map((product) => ({
+    id: product.id.toString(),
+  }));
+}
+export default async function Product({ params }) {
+  const { id } = await params;
+  const res = await fetch(
+    `https://api.example.com/products/${id}`
+  );
+  const product = await res.json();
+  return (
+    <div>
+      <h1>{product.name}</h1>
+      <p>{product.price}</p>
+    </div>
+  );
+}
+
+dynamicParams 
+dynamicParams ka use ye decide karne ke liye hota hai ki generateStaticParams() se generate na kiye gaye dynamic routes ko Next.js allow karega ya 404 dega.
+only write this 
+export const dynamicParams = true;  // Default behavior true hai. agar false hoga tab sirf generateStaticParams() wale params allowed honge
+
+Streaming 
+Streaming ka matlab hai: poora page ready hone ka wait na karke, page ko parts/chunks mein browser ko bhejna.
+Next.js App Router mein streaming ke liye commonly loading.js + Suspense use kiya jata hai.
+
+Server and client Composition Patterns 
+Next.js App Router mein Server Components aur Client Components ko ek saath use karne ke patterns ko Server and Client Composition Patterns kehte hain.
+
+Server Component
+      ↓
+Client Component
+
+app/
+└── dashboard/
+    ├── page.js          ← Server
+    └── Counter.js       ← Client
+
+page.js
+import Counter from "./Counter";
+export default function Dashboard() {
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <Counter />
+    </div>
+  );
+}
+Counter.js 
+"use client";
+import { useState } from "react";
+export default function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <button onClick={() => setCount(count + 1)}>
+      Count: {count}
+    </button>
+  );
+}
+
+Server
+ ↓
+Fetch Database/API
+ ↓
+Get data
+ ↓
+Client Component
+ ↓
+Interactive UI
+
+
+Server only code  
+import "server-only";
+const API_KEY = process.env.SECRET_API_KEY;
+export async function getData() {
+  const response = await fetch(
+    "https://api.example.com/data",
+    {
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+      },
+    }
+  );
+
+  return response.json();
+}
+Suppose tumhare paas secret API key hai: Ye server par rahega:Secret browser ko expose nahi karna.
+Browser
+   ↓
+Server Component
+   ↓
+server-only function
+   ↓
+SECRET_API_KEY
+   ↓
+External API
+
+note : db related kaam kar sakte hai 
+
+Client only code 
+Client-only code wo code hai jo browser mein hi run hona chahiye, kyunki usse browser APIs ya client-side features ki zarurat hoti hai.
+
+window
+document
+localStorage
+sessionStorage
+navigator
+useState
+useEffect
+onClick
+
+
+Client component placement 
+Client Component Placement ka matlab hai: "use client" ko application mein kahan aur kitni depth tak use karna chahiye.
+
+Dashboard.js 
+ Header.js 
+ Counter.js 
+ Footer.js 
+Counter.js = use client not Pure Dashboard.js ko use client banao 
+
+note - (Server->Client (possible) , Client->Server(Direct not indeirectly possible)) Component
+children prop ke through Server Component ko Client Component ke andar render karwa sakte ho.
+import ClientComponent from "./ClientComponent";
+import ServerComponent from "./ServerComponent";
+export default function Page() {
+  return (
+    <ClientComponent>
+      <ServerComponent />
+    </ClientComponent>
+  );
+}
+
+
+Interleaving server and client component
+Next.js mein interleaving ka simple meaning hai: Server aur Client Components ko ek hi component tree mein mix/combine karna.
+app/
+├── page.js
+├── ClientWrapper.js
+└── ServerContent.js
+page.js 
+import ClientWrapper from "./ClientWrapper";
+import ServerContent from "./ServerContent";
+export default function Page() {
+  return (
+    <ClientWrapper>
+      <ServerContent />
+    </ClientWrapper>
+  );
+}
+
+
+Data fetching 
+1. In Server Component 
+export default async function UsersPage() {
+  const res = await fetch("https://api.example.com/users");
+  const users = await res.json();
+  return (
+    <div>
+      {users.map((user) => (
+        <p key={user.id}>{user.name}</p>
+      ))}
+    </div>
+  );
+}
+2. Database se data fetch 
+Server Component mein directly database access bhi kar sakte ho.
+import { db } from "@/lib/db";
+export default async function UsersPage() {
+  const users = await db.user.findMany();
+  return (
+    <div>
+      {users.map((user) => (
+        <p key={user.id}>{user.name}</p>
+      ))}
+    </div>
+  );
+}
+3. Client Component mein data fetching
+"use client";
+import { useEffect, useState } from "react";
+export default function Users() {
+  const [users, setUsers] = useState([]);
+  useEffect(() => {
+    fetch("/api/users")
+      .then((res) => res.json())
+      .then((data) => setUsers(data));
+  }, []);
+  return (
+    <div>
+      {users.map((user) => (
+        <p key={user.id}>{user.name}</p>
+      ))}
+    </div>
+  );
+}
+Browser
+   ↓
+useEffect()
+   ↓
+API
+   ↓
+Data
+   ↓
+setUsers()
+   ↓
+UI update
+
+
+Sequential Data fetching
+Pehle ek data request complete hogi, uske baad doosri request start hogi.
+export default async function Page() {
+  const user = await getUser();
+  const orders = await getOrders(user.id);
+  return (
+    <div>
+      <h1>{user.name}</h1>
+
+      {orders.map((order) => (
+        <p key={order.id}>
+          {order.product}
+        </p>
+      ))}
+    </div>
+  );
+}
+User API
+   ↓
+User data mil gaya
+   ↓
+Orders API
+   ↓
+Orders data mil gaya
+   ↓
+UI
+
+
+Parallel Data fetching
+Multiple independent data requests ko ek saath start karna, instead of one request ke complete hone ka wait karna.
+example
+export default async function Dashboard() {
+  const [user, products, notifications] =
+    await Promise.all([
+      getUser(),
+      getProducts(),
+      getNotifications(),
+    ]);
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <p>Products: {products.length}</p>
+      <p>Notifications: {notifications.length}</p>
+    </div>
+  );
+}
+
+
+Data Mutations 
+Data fetching ka matlab tha data ko read karna.
+Data mutation ka matlab hai data ko change karna.
+
+CRUD Mutations
+CREATE  → नया data banana
+UPDATE  → existing data change karna
+DELETE  → data delete karna
+
+Next.js mein mutation using Server Action
+Modern Next.js mein Server Actions data mutations ke liye commonly use kiye jaate hain.
+actions.js  
+"use server";
+export async function createUser(formData) {
+  const name = formData.get("name");
+  // Database mein user create karo
+  console.log(name);
+}
+component.js 
+import { createUser } from "./actions";
+export default function Page() {
+  return (
+    <form action={createUser}>
+      <input
+        name="name"
+        placeholder="Enter name"
+      />
+      <button type="submit">
+        Create User
+      </button>
+    </form>
+  );
+}
+
+
+forms with server actions 
+Next.js App Router mein Server Actions ke saath form submit karna bahut simple hai.
+
+
+Separting server action 
+Server Action ko page.js ke andar likhne ke bajay alag actions.js file mein rakhna.
+app/
+└── users/
+    ├── page.js
+    └── actions.js
+actions.js 
+"use server";
+export async function createUser(formData) {
+  const name = formData.get("name");
+  console.log(name);
+  // Database operation
+}
+page.js 
+import { createUser } from "./actions";
+export default function Page() {
+  return (
+    <form action={createUser}>
+      <input
+        name="name"
+        placeholder="Enter name"
+      />
+      <button type="submit">
+        Create User
+      </button>
+    </form>
+  );
+}
+
+Invalid = sab kuch page.js me nhi 
+export default function Page() {
+  return (
+    <form action={createUser}>
+      <input name="name" />
+      <button>Create</button>
+    </form>
+  );
+}
+async function createUser(formData) {
+  "use server";
+  const name = formData.get("name");
+  // database operation
+}
+
+useFormStatus vs useActionState
+useFormStatus mainly pending/loading state ke liye hai.
+useActionState ka use Server Action ka result/state handle karne ke liye hota hai.
+
+Caching and all types 
+
+revalidatePath() → specific path revalidate
+revalidateTag()  → tagged data revalidate
+revalidate       → time-based revalidation
+no-store         → don't cache
+force-cache      → cache the fetch
+
+revalidatePath()
+Specific route/path ko revalidate karta hai.
+"use server";
+import { revalidatePath } from "next/cache";
+export async function updateProduct() {
+  // Database update
+  // await db.product.update(...);
+  revalidatePath("/products");
+}
+Meaning 
+Update product --- Database --- revalidatePath("/products") --- /products route revalidated 
+
+revalidateTag()
+Fetch ke data ko ek tag dete hain.
+const posts = await fetch(
+  "https://api.example.com/posts",
+  {
+    next: {
+      tags: ["posts"],
+    },
+  }
+);
+Jab post create/update/delete ho:
+"use server";
+import { revalidateTag } from "next/cache";
+export async function updatePost() {
+  // Database update
+  // await db.post.update(...);
+  revalidateTag("posts");
+}
+
+revalidate = Time-based revalidation.
+Yahan 60 seconds ka interval hai.
+const categories = await fetch(
+  "https://api.example.com/categories",
+  {
+    next: {
+      revalidate: 60,
+    },
+  }
+);
+
+no-store 
+Data ko cache nahi karta.
+Har request par fresh data fetch hota hai
+const user = await fetch(
+  "https://api.example.com/user",
+  {
+    cache: "no-store",
+  }
+);
+
+force-cache 
+Data ko cache karta hai.
+Same data ko cache se reuse kiya ja sakta hai.
+const products = await fetch(
+  "https://api.example.com/products",
+  {
+    cache: "force-cache",
+  }
+);
+
+
+Rendering 
+
+nextjs me 4 types of Rendering
+
+csr = browser me , it is for dynamic apps
+ssr = every request for , seo pages 
+ssg = build time , static content 
+isr = build + update , semi - dynamic
+
+csr me render in browser and html come with empty page 
+<div id="root"></div>
+<script src="app.js"></script>
+js kya karta hai js load -> React run -> api call -> dom banata hai
+result = html khali and js sab kuch banata hai
+pura data broswer me fetch hota hai
+
+example
+"use client"
+export default function Home() { 
+    const [data,setData] = useState([])
+    async function dataFetch() { 
+        const res = await fetch("https://jsonplaceholder.typicode.com/users")
+        const json = await res.json()
+        setData(json)
+    }
+}
+
+ssr me server par har request , full html with data come 
+js kya karta hai -> js come -> events attach karta hai means hydration
+result = html ready , js only interactivity deta hai hydration ka work js karta hai
+each request par server data fetch karta hai
+"use server"
+export default function Home() { 
+    async function dataFetch() { 
+        const res = await fetch("https://jsonplaceholder.typicode.com/users" , {  cache : "no-store" }) // ssr force 
+        const json = await res.json()
+        return json 
+    }
+}
+
+
+ssg me render actullay build time me html banta hai
+build time html banta server use send kar deta static rahta hai page
+same html har user ko
+js load => optional interactivity
+build time par ek bar data fetch
+"use server"
+export const revalidate = false;
+export default function Home() { 
+    async function dataFetch() { 
+        const res = await fetch("https://jsonplaceholder.typicode.com/users") 
+        const json = await res.json()
+        return json 
+    }
+}
+
+isr = static + auto update 
+export const revalidate = 10; //  10 sec बाद update Refresh 10 sec 
+export default function Home() { 
+    async function dataFetch() { 
+        const res = await fetch("https://jsonplaceholder.typicode.com/users") 
+        const json = await res.json()
+        return json 
+    }
+}
+
+
+Image import next js config url 
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+    ],
+  },
+};
+module.exports = nextConfig;
+                 Image in Next.js
+
+        ┌────────────┼────────────┐
+        ↓            ↓            ↓
+      Import       Public       External
+        ↓            ↓            ↓
+   import img     /image.jpg    https://...
+                                     ↓
+                              remotePatterns
+                                     ↓
+                               next.config.js
+
+in nextjs not jsx only js if use typescript then tsx not ts why
+Next.js allows JSX in .js files, while TypeScript needs .tsx to distinguish files containing JSX from .ts files without JSX.
+
+what jsx or tsx what is x advantage why we use that
+JSX = JavaScript XML, ek syntax hai jisme JavaScript ke andar HTML jaisa code likh sakte hain.
+
+in react project some file js and also some jsx 
+Yes, React project mein .js aur .jsx dono ho sakte hain, because both can contain JSX; .jsx simply makes it clear that the file contains JSX.
+
+redux = global state management library 
+
+1. createAsyncThunk
+export const fetchUsers = createAsyncThunk(
+  'users/fetchUsers',
+  async () => {
+    const res = await fetch('https://jsonplaceholder.typicode.com/users')
+    return res.json()
+  }
+)
+
+2. slice 
+const slice = createSlice({
+    name : "users" , 
+    initialState : { 
+        data : [] , 
+        onoff : false , 
+    } , 
+    reducers : { 
+        on : (state) => { 
+            state.onoff = true 
+        } , 
+        off : (state , action) => { 
+            state.onoff = action.payload 
+        }
+    } , 
+    extraReducers : (builder) => { 
+        builder.
+         .addCase(fetchUsers.pending, (state) => {
+            state.loading = true
+         })
+         .addCase(fetchUsers.fulfilled, (state, action) => {
+           state.loading = false
+           state.data = action.payload // [1,2,3]
+           console.log(action.type) // data
+      })
+         .addCase(fetchUsers.rejected, (state) => {
+           state.loading = false
+           state.error = "Error"
+      }) 
+    }
+})
+const { on , off } = slice.actions 
+export default userSlice.reducer
+
+3. store 
+import { configureStore } from '@reduxjs/toolkit'
+import userReducer from './userSlice'
+const store = configureStore({
+  reducer: {
+    users: userReducer
+  }
+})
+export default store
+
+4. main 
+import { Provider } from 'react-redux'
+import store from './store'
+<Provider store={store}>
+  <App />
+</Provider>
+
+5. use component
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchUsers } from './userSlice'
+import { on , off } from "userSlice"
+export default function Users() { 
+      const dispatch = useDispatch()
+      const { data , onoff } = useSelector((state) => state.users)
+      return (
+        <>
+         <button onClick={(e) => {
+             dispatch(fetchUsers())
+             dispatch(on())   
+         }}>On</button>
+         <button  onClick={(e) => {
+            dispatch({
+                type : "data", payload : [1,2,3]
+            })
+         }}>Off</button>
+        </>
+      )
+}
+
+all hooks 
+
+useState = component ka local state manage karta hai 
+useEffect = side effects handle karta hai 
+useContext = global data share karta hai 
+useRef = dom access and value store , re render nhi karta hai 
+useMemo = heavy calculation cache karta hai  
+useCallback = function memoize karta 
+useReducer = complex state manage karne ke liye 
+useLayoutEffect = dom update ke turant baad run 
+useImpreativeHandle = parent ko child ka control dena ref ke sath 
+useId = unqiue id generate karta hai 
+useTransition = ui update ko smooth banata hai 
+useDeferredValue = slow value update , delay karta hai 
+useSyncExternalStore = external store sync karta hai 
+useDebugValue = custom hook debug ke liye label deta hai 
+CustomHook = resuable custom hook 
+
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  useMemo,
+  useCallback,
+  useReducer,
+  useLayoutEffect,
+  useImperativeHandle,
+  useId,
+  useTransition,
+  useDeferredValue,
+  useSyncExternalStore,
+  useDebugValue,
+  forwardRef,
+} from "react";
+
+
+// ======================================================
+// 1. useState
+// Component ka local state manage karta hai
+// ======================================================
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <button onClick={() => setCount(count + 1)}>
+      {count}
+    </button>
+  );
+}
+
+
+// ======================================================
+// 2. useEffect
+// Side effects handle karta hai
+// ======================================================
+
+function User() {
+  useEffect(() => {
+    console.log("Component mounted");
+
+    return () => {
+      console.log("Component unmounted");
+    };
+  }, []);
+
+  return <h2>User</h2>;
+}
+
+
+// ======================================================
+// 3. useContext
+// Data ko multiple components ke saath share karta hai
+// ======================================================
+
+const ThemeContext = React.createContext("light");
+
+function Child() {
+  const theme = useContext(ThemeContext);
+
+  return <p>Theme: {theme}</p>;
+}
+
+function ContextExample() {
+  return (
+    <ThemeContext.Provider value="dark">
+      <Child />
+    </ThemeContext.Provider>
+  );
+}
+
+
+// ======================================================
+// 4. useRef
+// DOM access / value store karta hai
+// Ref change hone par re-render nahi hota
+// ======================================================
+
+function Input() {
+  const inputRef = useRef(null);
+
+  function focusInput() {
+    inputRef.current.focus();
+  }
+
+  return (
+    <>
+      <input ref={inputRef} />
+      <button onClick={focusInput}>
+        Focus
+      </button>
+    </>
+  );
+}
+
+
+// ======================================================
+// 5. useMemo
+// Expensive calculation ka result memoize karta hai
+// ======================================================
+
+function Calculation() {
+  const [count, setCount] = useState(0);
+
+  const result = useMemo(() => {
+    return count * 100;
+  }, [count]);
+
+  return (
+    <>
+      <p>{result}</p>
+
+      <button onClick={() => setCount(count + 1)}>
+        Increase
+      </button>
+    </>
+  );
+}
+
+
+// ======================================================
+// 6. useCallback
+// Function ko memoize karta hai
+// ======================================================
+
+function CallbackExample() {
+  const [count, setCount] = useState(0);
+
+  const handleClick = useCallback(() => {
+    console.log("Clicked");
+  }, []);
+
+  return (
+    <button onClick={() => {
+      setCount(count + 1);
+      handleClick();
+    }}>
+      {count}
+    </button>
+  );
+}
+
+
+// ======================================================
+// 7. useReducer
+// Complex state management ke liye
+// ======================================================
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "increment":
+      return {
+        count: state.count + 1,
+      };
+
+    default:
+      return state;
+  }
+}
+
+function ReducerExample() {
+  const [state, dispatch] = useReducer(
+    reducer,
+    { count: 0 }
+  );
+
+  return (
+    <button
+      onClick={() => dispatch({ type: "increment" })}
+    >
+      {state.count}
+    </button>
+  );
+}
+
+
+// ======================================================
+// 8. useLayoutEffect
+// DOM update ke baad browser paint se pehle run hota hai
+// ======================================================
+
+function LayoutExample() {
+  const boxRef = useRef(null);
+
+  useLayoutEffect(() => {
+    console.log(boxRef.current.getBoundingClientRect());
+  }, []);
+
+  return (
+    <div ref={boxRef}>
+      Box
+    </div>
+  );
+}
+
+
+// ======================================================
+// 9. useImperativeHandle
+// Parent ko child ke methods/control dena
+// ======================================================
+
+const ChildInput = forwardRef(function ChildInput(props, ref) {
+  const inputRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    focus() {
+      inputRef.current.focus();
+    },
+  }));
+
+  return <input ref={inputRef} />;
+});
+
+function Parent() {
+  const childRef = useRef(null);
+
+  return (
+    <>
+      <ChildInput ref={childRef} />
+
+      <button onClick={() => childRef.current.focus()}>
+        Focus Child
+      </button>
+    </>
+  );
+}
+
+
+// ======================================================
+// 10. useId
+// Unique ID generate karta hai
+// ======================================================
+
+function Login() {
+  const id = useId();
+
+  return (
+    <>
+      <label htmlFor={id}>
+        Email
+      </label>
+
+      <input id={id} />
+    </>
+  );
+}
+
+
+// ======================================================
+// 11. useTransition
+// Non-urgent UI update ko transition mein rakhta hai
+// ======================================================
+
+function TransitionExample() {
+  const [text, setText] = useState("");
+  const [isPending, startTransition] = useTransition();
+
+  function handleChange(e) {
+    const value = e.target.value;
+
+    setText(value);
+
+    startTransition(() => {
+      // Non-urgent update
+      console.log(value);
+    });
+  }
+
+  return (
+    <>
+      <input
+        value={text}
+        onChange={handleChange}
+      />
+
+      {isPending && <p>Updating...</p>}
+    </>
+  );
+}
+
+
+// ======================================================
+// 12. useDeferredValue
+// Value ke non-urgent version ko defer karta hai
+// ======================================================
+
+function Search() {
+  const [query, setQuery] = useState("");
+
+  const deferredQuery = useDeferredValue(query);
+
+  return (
+    <>
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+
+      <p>Searching: {deferredQuery}</p>
+    </>
+  );
+}
+
+
+// ======================================================
+// 13. useSyncExternalStore
+// External store ko React ke saath sync karta hai
+// ======================================================
+
+const store = {
+  value: 0,
+
+  listeners: new Set(),
+
+  subscribe(listener) {
+    this.listeners.add(listener);
+
+    return () => {
+      this.listeners.delete(listener);
+    };
+  },
+
+  getSnapshot() {
+    return this.value;
+  },
+
+  increment() {
+    this.value++;
+
+    this.listeners.forEach((listener) => {
+      listener();
+    });
+  },
+};
+
+function ExternalStoreExample() {
+  const value = useSyncExternalStore(
+    store.subscribe.bind(store),
+    store.getSnapshot.bind(store)
+  );
+
+  return (
+    <>
+      <p>{value}</p>
+
+      <button onClick={() => store.increment()}>
+        +
+      </button>
+    </>
+  );
+}
+
+
+// ======================================================
+// 14. useDebugValue
+// Custom Hook ko React DevTools mein label deta hai
+// ======================================================
+
+function useOnlineStatus() {
+  const [online, setOnline] = useState(true);
+
+  useDebugValue(
+    online ? "Online" : "Offline"
+  );
+
+  return online;
+}
+
+function Status() {
+  const online = useOnlineStatus();
+
+  return (
+    <p>
+      {online ? "Online" : "Offline"}
+    </p>
+  );
+}
+
+
+// ======================================================
+// 15. Custom Hook
+// Reusable logic ko custom hook mein rakhna
+// ======================================================
+
+function useCounter() {
+  const [count, setCount] = useState(0);
+
+  function increment() {
+    setCount(count + 1);
+  }
+
+  return {
+    count,
+    increment,
+  };
+}
+
+function CustomHookExample() {
+  const { count, increment } = useCounter();
+
+  return (
+    <button onClick={increment}>
+      {count}
+    </button>
+  );
+}
+
+
+// ======================================================
+// MAIN
+// ======================================================
+
+export default function App() {
+  return (
+    <>
+      <Counter />
+
+      <User />
+
+      <ContextExample />
+
+      <Input />
+
+      <Calculation />
+
+      <CallbackExample />
+
+      <ReducerExample />
+
+      <LayoutExample />
+
+      <Parent />
+
+      <Login />
+
+      <TransitionExample />
+
+      <Search />
+
+      <ExternalStoreExample />
+
+      <Status />
+
+      <CustomHookExample />
+    </>
+  );
+}
+
+note : 
+ Plan React Project me Server Component use nhi kiya ja sakta hai uske liye framework me bhut sare configuration karne hote hai 
+
+axios  
+1. axios instance = multiple requests same configuration 
+const axios = require("axios");
+const api = axios.create({
+  baseURL: "https://jsonplaceholder.typicode.com",
+  timeout: 5000,
+  headers: { Authorization: "Bearer TOKEN" },
+});
+api.get("/todos/1").then((res) => console.log(res.data));
+
+2. Interceptors (Requests/Response Middleware)
+Request and Response ke bich process karne deta hai 
+axios.interceptors.request.use((config) => {
+  console.log("Request Sent:", config.url);
+  // Headers add करना
+  config.headers["X-Custom-Header"] = "MyValue";
+  return config;
+});
+axios.interceptors.response.use(
+  (response) => {
+    console.log("Response Received:", response.status);
+    return response;
+  },
+  (error) => {
+    console.log("Error Occurred:", error.message);
+    return Promise.reject(error);
+  },
+);
+
+3. Cancel Token (Request Cancel karna) 
+async function oldCancelTokenExample() {
+  const source = axios.CancelToken.source();
+
+  try {
+    const request = api.get("/users", {
+      cancelToken: source.token,
+    });
+
+    // Cancel request
+    source.cancel("Request cancelled");
+
+    await request;
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.log("Cancelled:", error.message);
+    }
+  }
+}
+
+4. Timeouts 
+async function timeoutExample() {
+  try {
+    const response = await api.get("/users", {
+      timeout: 3000,
+    });
+
+    console.log(response.data);
+  } catch (error) {
+    console.log("Request timed out");
+  }
+}
+
+5. Transform Request / Response 
+Before send Request and after receive Response , There can be send data 
+axios({
+  url: "/posts",
+  method: "post",
+  data: { title: "hello" },
+  transformRequest: [
+    (data, headers) => {
+      data.title = data.title.toUpperCase(); // modify data before send
+      return JSON.stringify(data);
+    },
+  ],
+  transformResponse: [
+    (data) => {
+      const jsonData = JSON.parse(data);
+      jsonData.receivedAt = new Date();
+      return jsonData;
+    },
+  ],
+}).then((res) => console.log(res.data));
+ 
+6. Response Schema 
+Response me ye structure milega 
+axios.get("/todos/1").then((res) => {
+  console.log(res.data); // Actual response body
+  console.log(res.status); // HTTP status
+  console.log(res.headers); // Response headers
+});
+
+7. Concurrent Requests
+Send Multiple Requests 
+axios.all([axios.get("/todos/1"), axios.get("/todos/2")]).then(
+  axios.spread((res1, res2) => {
+    console.log(res1.data, res2.data);
+  }),
+);
+
+8. Custom Headers , Auth , Params 
+axios.get("/todos", {
+  headers: { "X-API-KEY": "abc123" },
+  params: { userId: 1 },
+});
+
+outlet = nested child route ko parent component ke andar render karne ki jagah
+
+dashboard.jsx 
+import { Outlet } from "react-router-dom";
+function Dashboard() {
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <nav>
+        <Link to="profile">Profile</Link>
+        <Link to="settings">Settings</Link>
+      </nav>
+      {/* Child route yahan render hoga */}
+      <Outlet />
+    </div>
+  );
+}
+<Route path="/dashboard" element={<Dashboard />}>
+  <Route path="profile" element={<Profile />} />
+  <Route path="settings" element={<Settings />} />
+</Route>
+Is code se ye samjha ja sakta hai ki Dashboard ek parent route hai aur profile aur settings uske child/nested routes hain.
+Outlet = Jis child route ka URL match hoga, uska component yahan render hoga.
+
+function Dashboard() {
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <nav>
+        <Link to="profile">Profile</Link>
+        <Link to="settings">Settings</Link>
+      </nav>
+      {/* Child route yahan render hoga */}
+      <Outlet />
+    </div>
+  );
+}
+example 
+we are in /dashboard and when we click profile link then route /dashboard with 
+Dashboard 
+links 
+here area profile page render 
+
+render but under the parent component his page so also we can see this part
+    <div>
+      <h1>Dashboard</h1>
+      <nav>
+        <Link to="profile">Profile</Link>
+        <Link to="settings">Settings</Link>
+      </nav>
+      ...........place for outlet component run or render
+      </div>
+
+
+class component
+
+constructor 
+componentDidMount 
+componentDidUpdate 
+componentWillUnmount 
+
+example 
+import React, { Component } from "react";
+class MyComponent extends Component {
+  render() {
+    return <h1>Hello Class Component</h1>;
+  }
+}
+export default MyComponent;
